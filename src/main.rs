@@ -1,5 +1,44 @@
 //following rust tutorial for now before NN
 
+fn borrowing() {
+    // //borrowing
+    // // variables can be borrowed by other guys but there will still be only one single owner.
+    // // can be borrowed by many, but if we borrow and modify, then only one borrower has access, and the others cant borrow it.
+    // //if a function called is not mutatating the guy, then the function just borrows the data, , its immutable borrowing, and goes bcak to owner after borrower is dead.
+    // //pass by reference wil pass &addr and so we dont give the ownership, just address
+    // let mut s1:String = String::from("hello dudew");
+    // let s2 = &s1;
+
+    // println!("1{}",s1);
+    // println!("2{}",s2);
+
+    // take_ownership(s2);
+    // println!("3{}",s1);
+
+    // //mutable references
+    // let mut s1:String = String::from("Hello");
+    // update_string(&mut s1);
+    // println!("4{}",s1);
+
+    //cant hvae multiple mutable refs or any immuts after mut ref
+
+    let mut s3 = String::from("Hekki");
+
+    let esss = &mut s3;
+    println!("{}", esss);
+    let bes = &mut s3;
+
+    println!("5{}", bes);
+}
+
+fn update_string(string: &mut String) {
+    string.push_str("dude");
+}
+
+fn take_ownership(s: &String) {
+    println!("2.5{}", s);
+}
+
 fn ownership() {
     //mem management w heap in rust
     //everythin is immutable by default, it stops race conditions between threads, unless stateed to be mutable (mut)
