@@ -1,4 +1,38 @@
 //following rust tutorial for now before NN
+use std::fs
+
+fn optionenum(){
+    //if we have functions that return should return a Null, instead we return an optional type, which will be the proper type, or a none type, but option wraps the null type so its safer.
+    // to return an optional value, we return  Some(value) or none, since some makes an option of value, not just the value, which makes the return value an enum
+    // 
+
+
+}
+
+fn errorhandling(){
+    //Error Handling in rust. Uses two enums
+    //Use the result Enum, we can have a good result type, or an error result type, but the error could be any number of things and then good result could be any number of data types, so instead we use a genertic.
+    //Generic is like type T, T can be anything. Captial Letters are generic fill in types 
+    //Rust provides the result enum for us already, with the Okay type, and the Error type
+
+
+    //~~ 
+    enum Result<A,B>{
+        Ok(A),
+        Err(B),
+    }
+
+    let res = fs::read_to_string("hello");
+
+    match res{
+        Ok(contents)=> println!("Contents are: {}",contents),
+        Err(error)=> println!("Error: {}",error),
+    } //-> so we can use pattern matching, similar to optional, to get the response.
+
+    //using res.unwrap(). unwrap function will return the internal value that we have picked of the reuslt, so it could be valid or error etc.
+
+
+}
 
 enum Shape{
         Circle(f64),
