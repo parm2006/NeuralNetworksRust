@@ -1,5 +1,55 @@
 //following rust tutorial for now before NN
 
+enum Shape{
+        Circle(f64),
+        Square(f64),
+        Triangle(f64, f64, f64),
+    }
+
+fn enums() {
+    //Enums are like custom variables where things have varients.
+    // For example if we want to make a compass variable, we can make a direction enum, and its 4 variants can be N,E,S,W. and then instead of using stringsm we have actual types for that, Its like a multiclass boolean
+    enum Direction {
+        N,
+        E,
+        S,
+        W,
+    }
+    //enums make functions etc  more strict and so its better. You have specific varients instead of just using any const strings.
+
+
+    let dir = Direction::N;
+    match dir {
+        Direction::N => println!("North"),
+        Direction::E => println!("East"),
+        Direction::S => println!("South"),
+        Direction::W => println!("West"),
+    }
+
+    //you can also have enums with varients that has data, like shapes
+    enum Shape{
+        Circle(f64),
+        Square(f64),
+        Triangle(f64, f64, f64),
+    }
+
+    let circ = Shape::Circle(5.0);
+
+    //best way to do logic with enums is pattern matchin enums
+
+    // this is like a sin
+
+}
+
+//paternmatching
+fn calculateArea(shape: Shape)->f64{
+    match shape{
+        Shape::Circle(rad) => rad*rad*3.14,
+        Shape::Square(side) => side*side,
+        Shape::Triangle(b,h) => 0.5*b*h,
+    }
+}
+
 struct User {
     active: bool,
     username: String,
