@@ -1,5 +1,20 @@
 //following rust tutorial for now before NN
 
+fn bool() {
+    let mut is_male = false;
+
+    //let isnotmale = !is_male;
+
+    if is_male {
+        print!("You are male");
+    } else {
+        is_male = true;
+    }
+    if is_male {
+        print!("Now you are male")
+    }
+}
+
 fn vars() {
     //simple variables in rust
     //define vars with let
