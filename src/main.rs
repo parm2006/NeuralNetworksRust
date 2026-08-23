@@ -1,5 +1,64 @@
 //following rust tutorial for now before NN
 
+struct User {
+    active: bool,
+    username: String,
+    email: String,
+    age: u32,
+}
+
+fn implementing() {
+    //we can also use impl "Struct Name{...}"}
+
+    //where we can define functions as a part of the struct to act like classes in c++,
+    //we dp:
+    /*
+    struct Rect{
+        width: u32,
+        height: u32,
+    }
+
+    impl Rect{
+        fn get_area(&self) -> u32{
+            self.width * self.height //if the last line , XXWERWERWEX, doesnt have a semicolor it is a shortcut for return XXWERWERWEX;
+        }
+        fn get_peri(&self) -> u32{
+            return 2* self.width + 2* self.height;
+        }
+    }
+
+    we also have debug and traits, for examlple to display we need format (fmt)
+
+    impl Debug for Rect{
+        fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+            write!(f,"{}",self.width*self.height) //this will return a write message or object of the area when we want to display the rect it self
+        }
+
+
+    We can also make unit struct which are variable/attributeless structs, they only have impls so we have functions to run without private vars
+
+     */
+}
+
+fn structures() {
+    let user = User {
+        username: String::from("Parth"),
+        age: 30,
+        active: true,
+        email: String::from("parth@gmail.com"),
+    };
+
+    //if the key and value of hte variable and the struct is the same, then instead of assigning it, we can just use ir ie:
+    let username = String::from("me");
+
+    let user2 = User {
+        username,
+        active: true,
+        email: String::from("dud@gmail.com"),
+        age: 34,
+    };
+}
+
 fn borrowing() {
     // //borrowing
     // // variables can be borrowed by other guys but there will still be only one single owner.
