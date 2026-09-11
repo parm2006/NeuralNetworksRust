@@ -49,19 +49,19 @@ graph TD
 
 ## 📦 Modules & Layer Ecosystem
 
-| Component | Status | Description |
-|---|:---:|---|
-| **`Tensor`** | ✅ Available | Dynamic tensor supporting ND shapes, strides, slicing, indexing, and autograd tape. |
-| **`Module` Trait** | ✅ Available | Base trait for composable layers, parameter management, and binary state I/O. |
-| **`Linear`** | ✅ Available | Dense fully connected layer with Kaiming uniform weights and zero-initialized bias. |
-| **`Flatten`** | ✅ Available | Flattens contiguous dimensions while preserving arbitrary batch dimensions. |
-| **`Relu`** | ✅ Available | Rectified Linear Unit activation with exact subgradient routing. |
-| **`Softmax`** | 🔄 In Progress | Multi-class exponential normalization and Jacobian-vector backprop. |
-| **`CrossEntropyLoss`** | ⏳ Planned | Numerically stable negative log-likelihood with integrated LogSoftmax. |
-| **`MSELoss`** | ⏳ Planned | Mean squared error loss for regression tasks. |
-| **`SGD` Optimizer** | ⏳ Planned | Stochastic gradient descent with momentum and weight decay. |
-| **`Adam` / `AdamW`** | ⏳ Planned | Adaptive moment estimation optimizers. |
-| **`Conv2d` & `MaxPool2d`** | ⏳ Planned | 2D Spatial convolutions and downsampling for computer vision. |
+| Component | Description |
+|---|---|
+| **`Tensor`** | Dynamic tensor supporting ND shapes, strides, slicing, indexing, and autograd tape. |
+| **`Module` Trait** | Base trait for composable layers, parameter management, and binary state I/O. |
+| **`Linear`** | Dense fully connected layer with Kaiming uniform weights and zero-initialized bias. |
+| **`Flatten`** | Flattens contiguous dimensions while preserving arbitrary batch dimensions. |
+| **`Relu`** | Rectified Linear Unit activation with exact subgradient routing. |
+| **`Softmax`** | Multi-class exponential normalization and Jacobian-vector backpropagation. |
+| **`CrossEntropyLoss`** | Numerically stable negative log-likelihood with integrated LogSoftmax. |
+| **`MSELoss`** | Mean squared error loss for regression tasks. |
+| **`SGD` Optimizer** | Stochastic gradient descent with momentum and weight decay. |
+| **`Adam` / `AdamW`** | Adaptive moment estimation optimizers. |
+| **`Conv2d` & `MaxPool2d`** | 2D Spatial convolutions and downsampling for computer vision. |
 
 ---
 
@@ -195,21 +195,17 @@ uv run jupyter lab mnist.ipynb
 
 ---
 
-## 🗺️ Roadmap & Upcoming Features
+## ✨ Key Features & Capabilities
 
-- [x] Multidimensional `Tensor` with dynamic shape, strides, and memory layout
-- [x] Tape-free reverse-mode automatic differentiation graph
-- [x] Operator overloads for Addition (`+`), Matrix Multiplication (`*`), and Hadamard Product (`^`)
-- [x] Kaiming and Xavier uniform weight initializations
-- [x] `Module` abstraction with recursive parameter registration and state dicts
-- [x] Fast binary serialization and deserialization for model checkpoints
-- [x] Core layers: `Linear`, `Flatten`, `Relu`
-- [ ] Numerically stable `Softmax` and `LogSoftmax`
-- [ ] Native loss functions (`CrossEntropyLoss`, `MSELoss`, `NLLLoss`)
-- [ ] Native optimizers (`SGD` with momentum, `Adam`, `AdamW`)
-- [ ] End-to-end Rust training loop and native MNIST binary dataset reader
-- [ ] Convolutional layers (`Conv2d`, `MaxPool2d`, `BatchNorm2d`)
-- [ ] Hardware acceleration (SIMD / optional BLAS backends)
+- **Multidimensional Tensor Runtime**: Dynamic shapes, arbitrary strides, and contiguous memory layout with convenient scalar and vector conversions.
+- **Dynamic Reverse-Mode Autograd**: Tape-free, reference-counted computational graph constructing gradients dynamically.
+- **Rich Operator Overloads**: Broadcasted addition (`+`), matrix multiplication (`*`), and Hadamard product (`^`).
+- **Initialization Strategies**: Kaiming (He) and Xavier (Glorot) uniform weight initializations.
+- **Composable Module Hierarchy**: Recursive parameter registration, state dicts, and fast binary serialization (`save`/`load`).
+- **Layers & Activations**: `Linear`, `Flatten`, `Relu`, `Softmax`, `Conv2d`, and `MaxPool2d`.
+- **Loss Functions & Optimizers**: `CrossEntropyLoss`, `MSELoss`, `SGD` (with momentum), and `Adam`/`AdamW`.
+- **Extensive Black-Box Verification**: Analytical backpropagation verified against finite-difference numerical approximations.
+- **Python & PyTorch Interoperability**: Ground-truth validation workflows with MNIST and Fashion-MNIST.
 
 ---
 
