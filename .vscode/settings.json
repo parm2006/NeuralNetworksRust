@@ -1,0 +1,16 @@
+{
+    "python.analysis.autoImportCompletions": false,
+    "editor.inlineSuggest.enabled": false,
+    "editor.inlayHints.enabled": "off",
+    "notebook.inlineSuggest.enabled": false,
+    "[python]": {
+        "editor.inlineSuggest.enabled": false
+    },
+    "editor.suggest.preview": false,
+    "editor.quickSuggestions": {
+        "other": "on",
+        "comments": "off",
+        "strings": "off"
+    },
+    "editor.suggestOnTriggerCharacters": true
+}
