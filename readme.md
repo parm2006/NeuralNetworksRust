@@ -1,6 +1,6 @@
 # NeuralNetworksRust 🦀🧠
 
-A lightweight, pure-Rust deep learning framework featuring a dynamic reverse-mode automatic differentiation (autograd) engine, multidimensional tensor operations with broadcasting, modular layer abstractions, and binary model serialization—built from scratch with zero heavy external dependencies.
+A lightweight, pure-Rust deep learning framework featuring a dynamic reverse-mode automatic differentiation (autograd) engine, multidimensional tensor operations with broadcasting, modular layer abstractions, loss functions, optimizers, and binary model serialization—built from scratch with zero heavy external dependencies.
 
 ---
 
@@ -8,7 +8,9 @@ A lightweight, pure-Rust deep learning framework featuring a dynamic reverse-mod
 
 - **Dynamic Autograd Engine**: Reverse-mode automatic differentiation building a tape-free, reference-counted computational graph on the fly.
 - **Multidimensional Tensor Runtime**: Tensors supporting arbitrary dimensions, strides, matrix multiplications with batched broadcasting, and Kaiming/Xavier initializations.
-- **Modular PyTorch-style API**: Hierarchical `Module` trait with sub-module nesting, recursive parameter tracking, state dictionaries, and gradient management.
+- **Modular PyTorch-style API**: Hierarchical `Module` trait with sub-module nesting, `Sequential` container, recursive parameter tracking, state dictionaries, and gradient management.
+- **Loss Functions**: Analytical loss functions including `MSELoss`, `NLLLoss`, and `CrossEntropyLoss` (composed seamlessly via `Softmax` + `NLLLoss`).
+- **First-Class Optimizers**: Base `Optimizer` trait with `SGD` and modern `AdamW` (with decoupled weight decay).
 - **Binary Model Checkpointing**: Custom high-speed binary serialization and deserialization (`.bin` state dict format) for checkpointing and restoring trained models.
 - **Zero-Dependency Core**: Pure Rust standard library core—no heavy C/C++ or external BLAS runtime requirements.
 - **Rigorously Tested**: Comprehensive black-box unit tests and finite-difference numerical gradient verifications checking analytical backprop accuracy against machine epsilon.
@@ -31,8 +33,20 @@ graph TD
     subgraph Modules ["Module Ecosystem"]
         Linear["Linear (Dense)<br/>Kaiming Weights + Bias"]
         Flatten["Flatten<br/>Multi-dim Reshape"]
-        Relu["Relu<br/>Masked Gradient"]
+        Relu["Relu / Sigmoid<br/>Activations"]
         Softmax["Softmax<br/>Stable Probabilities"]
+        Sequential["Sequential<br/>Chained Pipeline"]
+    end
+
+    subgraph Losses ["Loss Functions"]
+        MSE["MSELoss<br/>Regression"]
+        NLL["NLLLoss<br/>Log Probabilities"]
+        CE["CrossEntropyLoss<br/>Softmax + NLL"]
+    end
+
+    subgraph Optim ["Optimizers"]
+        SGD["SGD<br/>Stochastic Gradient Descent"]
+        AdamW["AdamW<br/>Decoupled Weight Decay"]
     end
     
     subgraph State ["Serialization & Lifecycle"]
@@ -42,12 +56,14 @@ graph TD
 
     Tensor --> Ops
     Ops --> Modules
+    Modules --> Losses
+    Losses --> Optim
     Modules --> State
 ```
 
 ---
 
-## 📦 Modules & Layer Ecosystem
+## 📦 Modules & Component Ecosystem
 
 | Component | Description |
 |---|---|
@@ -56,12 +72,16 @@ graph TD
 | **`Linear`** | Dense fully connected layer with Kaiming uniform weights and zero-initialized bias. |
 | **`Flatten`** | Flattens contiguous dimensions while preserving arbitrary batch dimensions. |
 | **`Relu`** | Rectified Linear Unit activation with exact subgradient routing. |
+| **`Sigmoid`** | Sigmoid activation function. |
 | **`Softmax`** | Multi-class exponential normalization and Jacobian-vector backpropagation. |
-| **`CrossEntropyLoss`** | Numerically stable negative log-likelihood with integrated LogSoftmax. |
+| **`Sequential`** | Sequential layer container executing forward passes in chained order. |
+| **`Loss` Trait** | Base trait for computing training losses. |
 | **`MSELoss`** | Mean squared error loss for regression tasks. |
-| **`SGD` Optimizer** | Stochastic gradient descent with momentum and weight decay. |
-| **`Adam` / `AdamW`** | Adaptive moment estimation optimizers. |
-| **`Conv2d` & `MaxPool2d`** | 2D Spatial convolutions and downsampling for computer vision. |
+| **`NLLLoss`** | Negative log-likelihood loss supporting class indices, one-hot, and soft distribution targets. |
+| **`CrossEntropyLoss`** | Numerically stable multi-class cross entropy composed of Softmax and NLLLoss. |
+| **`Optimizer` Trait** | Base trait providing `.step()` and `.zero_grad()` for all optimizers. |
+| **`SGD`** | Basic stochastic gradient descent optimizer. |
+| **`AdamW`** | Adaptive moment estimation optimizer with decoupled weight decay. |
 
 ---
 
@@ -92,60 +112,54 @@ let loss = &c * 2.0;
 println!("Loss shape: {:?}", loss.shape());
 ```
 
-### 2. Defining a Neural Network
+### 2. Defining a Model with `Sequential`
 
 ```rust
-use NeuralNetworksRust::{Tensor, Module, Flatten, Linear, Relu};
+use NeuralNetworksRust::{Tensor, Module, Sequential, Flatten, Linear, Relu};
 
-pub struct Net {
-    pub flatten: Flatten,
-    pub fc1: Linear,
-    pub relu: Relu,
-    pub fc2: Linear,
-}
+let model = Sequential::new(vec![
+    Box::new(Flatten::new(1, None)),
+    Box::new(Linear::new(28 * 28, 128)),
+    Box::new(Relu::new()),
+    Box::new(Linear::new(128, 10)),
+]);
 
-impl Net {
-    pub fn new() -> Self {
-        Self {
-            flatten: Flatten::new(1, None), // Preserve batch dimension
-            fc1: Linear::new(28 * 28, 128),
-            relu: Relu::new(),
-            fc2: Linear::new(128, 10),
-        }
-    }
-}
+let input = Tensor::random(vec![4, 28, 28]);
+let logits = model.forward(&input);
 
-impl Module for Net {
-    fn forward(&self, x: &Tensor) -> Tensor {
-        let x = self.flatten.forward(x);
-        let x = self.fc1.forward(&x);
-        let x = self.relu.forward(&x);
-        self.fc2.forward(&x)
-    }
-
-    fn modules(&self) -> Vec<(String, &dyn Module)> {
-        vec![
-            ("flatten".to_string(), &self.flatten),
-            ("fc1".to_string(), &self.fc1),
-            ("relu".to_string(), &self.relu),
-            ("fc2".to_string(), &self.fc2),
-        ]
-    }
-}
-
-fn main() {
-    let model = Net::new();
-    
-    // Batch of 4 images: [batch_size, height, width]
-    let input = Tensor::random(vec![4, 28, 28]);
-    let logits = model.forward(&input);
-
-    assert_eq!(logits.shape(), vec![4, 10]);
-    println!("Output logits:\n{}", logits);
-}
+assert_eq!(logits.shape(), vec![4, 10]);
 ```
 
-### 3. Checkpointing & State Persistence
+### 3. Training Step: Loss & Optimization
+
+```rust
+use NeuralNetworksRust::{Tensor, Module, Sequential, Linear, CrossEntropyLoss, Loss, AdamW, Optimizer};
+
+let model = Sequential::new(vec![
+    Box::new(Linear::new(10, 3)),
+]);
+
+let mut optimizer = AdamW::new(model.parameters(), 0.001);
+let criterion = CrossEntropyLoss::new();
+
+let x = Tensor::random(vec![4, 10]);
+let targets = Tensor::new(vec![0.0, 1.0, 2.0, 0.0], vec![4]); // Class indices
+
+// Zero gradients
+optimizer.zero_grad();
+
+// Forward pass
+let logits = model.forward(&x);
+let loss = criterion.forward(&logits, &targets);
+
+// Backward pass
+loss.backward();
+
+// Parameter update
+optimizer.step();
+```
+
+### 4. Checkpointing & State Persistence
 
 Save and restore weights using the native binary format:
 
@@ -154,7 +168,7 @@ Save and restore weights using the native binary format:
 model.save("checkpoint.bin").expect("Failed to save model");
 
 // Load parameters into an existing architecture
-let restored_model = Net::new();
+let restored_model = Sequential::new(vec![...]);
 restored_model.load("checkpoint.bin").expect("Failed to load model");
 ```
 
@@ -177,6 +191,7 @@ cargo test
 - **`tests/test_elemmul.rs`**: Element-wise multiplication (`^`) product-rule checks.
 - **`tests/test_matmul.rs`**: 1D dot product, 2D matrix multiplication, and higher-order batched matrix multiplication gradients.
 - **`tests/test_gradients.rs`**: Complex multi-layer computation graph backward verifications against numerical approximations.
+- **`tests/test_losses.rs`**: Analytical loss checks and numerical gradient validations for `MSELoss`, `NLLLoss`, and `CrossEntropyLoss`.
 
 ---
 
@@ -192,20 +207,6 @@ To launch the notebook environment with [uv](https://github.com/astral-sh/uv):
 ```bash
 uv run jupyter lab mnist.ipynb
 ```
-
----
-
-## ✨ Key Features & Capabilities
-
-- **Multidimensional Tensor Runtime**: Dynamic shapes, arbitrary strides, and contiguous memory layout with convenient scalar and vector conversions.
-- **Dynamic Reverse-Mode Autograd**: Tape-free, reference-counted computational graph constructing gradients dynamically.
-- **Rich Operator Overloads**: Broadcasted addition (`+`), matrix multiplication (`*`), and Hadamard product (`^`).
-- **Initialization Strategies**: Kaiming (He) and Xavier (Glorot) uniform weight initializations.
-- **Composable Module Hierarchy**: Recursive parameter registration, state dicts, and fast binary serialization (`save`/`load`).
-- **Layers & Activations**: `Linear`, `Flatten`, `Relu`, `Softmax`, `Conv2d`, and `MaxPool2d`.
-- **Loss Functions & Optimizers**: `CrossEntropyLoss`, `MSELoss`, `SGD` (with momentum), and `Adam`/`AdamW`.
-- **Extensive Black-Box Verification**: Analytical backpropagation verified against finite-difference numerical approximations.
-- **Python & PyTorch Interoperability**: Ground-truth validation workflows with MNIST and Fashion-MNIST.
 
 ---
 

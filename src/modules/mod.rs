@@ -3,9 +3,13 @@ pub mod flatten;
 pub mod linear;
 pub mod relu;
 pub mod softmax;
+pub mod sigmoid;
+pub mod sequential;
 
 pub use module::Module;
 pub use flatten::Flatten;
 pub use linear::Linear;
 pub use relu::Relu;
 pub use softmax::Softmax;
+pub use sigmoid::Sigmoid;
+pub use sequential::Sequential;

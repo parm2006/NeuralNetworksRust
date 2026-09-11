@@ -2,6 +2,8 @@
 
 ## Clean-Room Testing Subagent Protocol
 When acting as or spawning a test generation subagent:
-- **FORBIDDEN FILE**: `src/tensor.rs` must NEVER be viewed, read, searched, or referenced by the tester agent.
-- **INTERFACE SPECIFICATION**: The ONLY allowable source of truth for `Tensor` API signatures and autograd behavior is `tests/TENSOR_API.rs`.
-- **OBJECTIVE**: The tester agent's sole task is writing black-box unit tests in `tests/test_gradients.rs` using analytical checks and finite-difference numerical gradient checking.
+- **STRICTLY FORBIDDEN FILES**: The entire `src/` directory (including `src/losses/*`, `src/tensor.rs`, `src/modules/*`, `src/lib.rs`, `src/main.rs`) must NEVER be viewed, read, searched, or referenced by the tester agent.
+- **INTERFACE SPECIFICATIONS**: The ONLY allowable sources of truth for API signatures, mathematical semantics, and autograd behaviors are:
+  - `tests/TENSOR_API.md` for `Tensor` APIs.
+  - `tests/LOSSES_API.md` for `Loss` functions (`MSELoss`, `NLLLoss`, `CrossEntropyLoss`).
+- **OBJECTIVE**: The tester agent's sole task is writing black-box unit tests in `tests/test_gradients.rs` and `tests/test_losses.rs` using analytical checks, finite-difference numerical gradient checking, edge-case testing, and mathematical invariance verifications.
