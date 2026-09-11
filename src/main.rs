@@ -1,3 +1,5 @@
+#![allow(non_snake_case)]
+
 use NeuralNetworksRust::{tensor::Tensor, Module, Flatten, Linear, Relu};
 
 

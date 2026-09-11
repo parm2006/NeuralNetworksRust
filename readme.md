@@ -195,17 +195,26 @@ cargo test
 
 ---
 
-## 🐍 Python & MNIST Experiments
+## 🖥️ Interactive Inference Visualizer (`infer.py`)
 
-The `mnist.ipynb` notebook provides:
-- A reference PyTorch model trained on the MNIST and Fashion-MNIST datasets.
-- Pre-trained model artifact export (`model.pth`).
-- Cross-validation benchmarks between the Rust forward inference pass and PyTorch outputs.
-
-To launch the notebook environment with [uv](https://github.com/astral-sh/uv):
+Run interactive inference using the pure-Rust model with Python visual rendering:
 
 ```bash
-uv run jupyter lab mnist.ipynb
+uv run python infer.py [sample_index]
+```
+
+---
+
+## 🐍 Original Python Prototyping (`python_mnist/`)
+
+All original Python prototyping and PyTorch reference artifacts are isolated in `python_mnist/`:
+- **`python_mnist/mnist.ipynb`**: Original PyTorch training notebook.
+- **`python_mnist/model.pth`**: Pre-trained PyTorch weights.
+
+To launch the reference Jupyter notebook with [uv](https://github.com/astral-sh/uv):
+
+```bash
+uv run jupyter lab python_mnist/mnist.ipynb
 ```
 
 ---

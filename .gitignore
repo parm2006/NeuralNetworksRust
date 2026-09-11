@@ -1,5 +1,6 @@
 /target
-
 /data
 /scratch
-
+__pycache__/
+*.bin
+.venv/
