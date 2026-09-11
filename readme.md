@@ -195,12 +195,28 @@ cargo test
 
 ---
 
-## 🖥️ Interactive Inference Visualizer (`infer.py`)
+## 🖥️ Interactive Inference & Pre-Trained Weights
 
-Run interactive inference using the pure-Rust model with Python visual rendering:
+The repository includes pre-trained model weights (**`parm_mnist_model.bin`**) trained by Parth ([@parm2006](https://github.com/parm2006)) achieving high accuracy on the full MNIST dataset.
+
+### Running Inference
+
+Run inference directly from the pure-Rust model or with the interactive Python visualizer:
 
 ```bash
+# Pure Rust terminal inference with ASCII render:
+cargo run --release --bin mnist -- [sample_index]
+
+# Interactive visualizer with matplotlib digit plot & confidence distribution:
 uv run python infer.py [sample_index]
+```
+
+### Training from Scratch
+
+To retrain the model for 5 epochs on all 60,000 samples:
+
+```bash
+cargo run --release --bin mnist
 ```
 
 ---

@@ -3,4 +3,5 @@
 /scratch
 __pycache__/
 *.bin
+!parm_mnist_model.bin
 .venv/

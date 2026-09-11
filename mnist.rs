@@ -187,7 +187,7 @@ fn run_single_inference(index: usize, model_path: &str) {
 
 fn main() {
     let args: Vec<String> = env::args().collect();
-    let model_path = "mnist_model.bin";
+    let model_path = "parm_mnist_model.bin";
 
     if args.len() > 1 && args[1] != "--train" {
         // If an integer index is provided, run single inference on that sample
